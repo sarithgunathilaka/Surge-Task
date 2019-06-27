@@ -18,8 +18,41 @@ const UserSession = require('../models/UserSession');
       password
     } = body;
 
-    
-    
+    if (!firstName) {
+      res.send({
+        success: false,
+        message: 'Error: First name cannot be blank'
+      })
+    }
+    if (!lastName) {
+      res.send({
+        success: false,
+        message: 'Error: Last name cannot be blank'
+      })
+    }
+    if (!email) {
+      res.send({
+        success: false,
+        message: 'Error: email cannot be blank'
+      })
+    }
+    if (!password) {
+      res.send({
+        success: false,
+        message: 'Error: password cannot be blank'
+      })
+    }
+
+    User.find({
+      email: email
+    }, (err, previousUsers) => {
+      if (err) {
+        res.send('Error: Server error');
+      } else if (previousUsers.length > 0) {
+        res.send('Error: Account already exist');
+      }
+    })
+     
    const newUser = new User();
       newUser.firstName = firstName;
       newUser.lastName = lastName;
