@@ -203,6 +203,11 @@ const UserSession = require('../models/UserSession');
   // @desc    View Users
   // @access  Private
   router.get('/viewUsers', (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
+
     User.find({}, 'firstName lastName email isDeleted', (err, users) => {
       if(err) {
         return res.send({
@@ -220,22 +225,5 @@ const UserSession = require('../models/UserSession');
    });
   });
 
-  router.get('/viewUsersSession', (req, res) => {
-    UserSession.find({}, (err, users) => {
-      if(err) {
-        return res.send({
-          succes: false,
-          message: 'server error'
-        })
-      }
-  
-      return res.send({
-        success: true,
-        message: users
-      })
-   });
-  });
-
-
-
+ 
 module.exports = router;
