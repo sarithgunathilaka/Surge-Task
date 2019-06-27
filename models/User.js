@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcryptjs');
 
 // Create Schema
 const UserSchema = new Schema({
@@ -22,6 +23,10 @@ const UserSchema = new Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -31,7 +36,7 @@ UserSchema.methods.validPassword = function( password ) {
 };
 
 UserSchema.methods.generateHash = function(password) {
-  return bcrupt.hashSync(password, bcrypt.genSaltSync(8), null);
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 }
 
 UserSchema.methods.validpassword = function(password) {

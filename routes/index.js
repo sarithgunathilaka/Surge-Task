@@ -57,9 +57,14 @@ const UserSession = require('../models/UserSession');
       newUser.firstName = firstName;
       newUser.lastName = lastName;
       newUser.email = email;
-      newUser.password = password;
+      newUser.password = newUser.generateHash(password);
       
-   newUser.save().then(user => res.json(user));
+    newUser.save((err, user) => {
+      res.send({
+        success: true,
+        message: 'Account created'
+      })
+    })
   });
 
   // @route   POST api/login
@@ -71,6 +76,19 @@ const UserSession = require('../models/UserSession');
       email,
       password
     } = body;
+
+    if (!email) {
+      res.send({
+        success: false,
+        message: 'Error: email cannot be blank'
+      })
+    }
+    if (!password) {
+      res.send({
+        success: false,
+        message: 'Error: password cannot be blank'
+      })
+    }
   
     User.find({
       email: email
@@ -117,8 +135,75 @@ const UserSession = require('../models/UserSession');
    
   });
 
-  router.get('/usersGet', (req, res) => {
-    User.find({}, 'firstName lastName email', (err, users) => {
+  // @route   GET api/verify
+  // @desc    verify token
+  // @access  Private
+  router.get('/verify', (req, res, next) => {
+    const { query } = req;
+    const { token } = query;
+
+    UserSession.find({
+      _id: token
+    }, (err, sessions) => {
+      if (err) {
+        return res.send({
+          succes: false,
+          message: 'Server Error'
+        })
+      }
+
+      if(sessions.length !=1){
+        return res.send({
+          succes: false,
+          message: 'Error: Invalid'
+        })
+      } else {
+        return res.send({
+          succes: true,
+          message: 'Green!'
+        })
+      }
+    })
+
+  });
+
+  // @route   GET api/logout
+  // @desc    Logout
+  // @access  Private
+  router.get('/logout', (req, res, next) => {
+    const { query } = req;
+    const { token } = query;
+
+    UserSession.findOneAndUpdate({
+      _id: token,
+      isDeleted: false
+    }, {
+      $set:{
+      isDeleted:true
+      }
+    }, null, (err, sessions) => {
+      
+      if (err) {
+        return res.send({
+          succes: false,
+          message: 'Server Error'
+        })
+      }
+
+      
+        return res.send({
+          succes: true,
+          message: 'Green!'
+        })
+      
+    })
+  });
+
+  // @route   POST api/viewUsers
+  // @desc    View Users
+  // @access  Private
+  router.get('/viewUsers', (req, res) => {
+    User.find({}, 'firstName lastName email isDeleted', (err, users) => {
       if(err) {
         return res.send({
           succes: false,
@@ -128,6 +213,22 @@ const UserSession = require('../models/UserSession');
   
       console.log('userArray', users[0].firstName)
       console.log('userArrayLength', users.length)
+      return res.send({
+        success: true,
+        message: users
+      })
+   });
+  });
+
+  router.get('/viewUsersSession', (req, res) => {
+    UserSession.find({}, (err, users) => {
+      if(err) {
+        return res.send({
+          succes: false,
+          message: 'server error'
+        })
+      }
+  
       return res.send({
         success: true,
         message: users

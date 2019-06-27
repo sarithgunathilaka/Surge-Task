@@ -10,6 +10,10 @@ const UserSessionSchema = new Schema({
   timeStamp: {
     type: String,
     default: Date.now()
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
   
 });
