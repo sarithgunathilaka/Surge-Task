@@ -30,13 +30,16 @@ const UserSchema = new Schema({
   }
 });
 
-
+UserSchema.methods.validPassword = function( password ) {
+  // EXAMPLE CODE!
+  return ( this.password === password );
+};
 
 UserSchema.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 }
 
-UserSchema.methods.validPassword = function(password) {
+UserSchema.methods.validpassword = function(password) {
   return bcrypt.compareSync(password, this.password);
 }
 module.exports = User = mongoose.model('user', UserSchema);
