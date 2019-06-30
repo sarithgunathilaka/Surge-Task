@@ -21,25 +21,25 @@ const UserSession = require('../models/UserSession');
     if (!firstName) {
       res.send({
         success: false,
-        message: 'Error: First name cannot be blank'
+        message: 'First name cannot be blank'
       })
     }
     if (!lastName) {
       res.send({
         success: false,
-        message: 'Error: Last name cannot be blank'
+        message: 'Last name cannot be blank'
       })
     }
     if (!email) {
       res.send({
         success: false,
-        message: 'Error: email cannot be blank'
+        message: 'Email cannot be blank'
       })
     }
     if (!password) {
       res.send({
         success: false,
-        message: 'Error: password cannot be blank'
+        message: 'password cannot be blank'
       })
     }
 
@@ -71,6 +71,9 @@ const UserSession = require('../models/UserSession');
   // @desc    login a user
   // @access  Private
   router.post('/login', (req, res, next) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
     const { body } = req;
     const {
       email,
@@ -80,13 +83,13 @@ const UserSession = require('../models/UserSession');
     if (!email) {
       res.send({
         success: false,
-        message: 'Error: email cannot be blank'
+        message: 'Email cannot be blank'
       })
     }
     if (!password) {
       res.send({
         success: false,
-        message: 'Error: password cannot be blank'
+        message: 'Password cannot be blank'
       })
     }
   
@@ -204,25 +207,31 @@ const UserSession = require('../models/UserSession');
   // @access  Private
   router.get('/viewUsers', (req, res) => {
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-
-
-    User.find({}, 'firstName lastName email isDeleted', (err, users) => {
-      if(err) {
+    User.find({}, (err, users) => {
+      if(users == 0) {
         return res.send({
           succes: false,
-          message: 'server error'
+          message: 'no users'
         })
       }
-  
-      console.log('userArray', users[0].firstName)
-      console.log('userArrayLength', users.length)
-      return res.send({
-        success: true,
-        message: users
-      })
+      
+      User.find({}, 'firstName lastName email', (err, users) => {
+        if(err) {
+          return res.send({
+            succes: false,
+            message: 'server error'
+          })
+        }
+        return res.send({
+          success: true,
+          message: users
+        })
+     });
+      
    });
+
+
+   
   });
 
  
